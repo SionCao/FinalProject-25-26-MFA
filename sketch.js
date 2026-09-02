@@ -1,3 +1,68 @@
+// Communio: Welcome to Symbiosis
+// Sion Cao
+// 2026.9.2
+
+// Instructions:
+// Communio is an interactive computational installation that transforms
+// participant data into individual digital cells within a shared ecosystem.
+// Enter your name to begin, then position your face in front of the camera
+// and remain still while the system captures and analyses facial and
+// pseudo-thermal features. These features determine the visual appearance
+// and identity of your digital cell.
+//
+// Next, speak into the microphone for approximately five seconds.
+// Volume, pitch, rhythm, variation, and silence are analysed and translated
+// into the cell's size, movement, activity, and behavioural characteristics.
+// Silence is also accepted as a valid input.
+//
+// Once generated, the cell enters the shared computational ecosystem.
+// Use your hand and index finger in front of the gesture camera to interact
+// with the cells. Cells continuously compare their identity signatures and
+// behavioural characteristics. Similar and compatible cells can communicate,
+// attract, gather, and gradually fuse over time.
+
+
+// Optional Blurb:
+// Communio explores the emerging symbiotic relationship between humans and
+// computational systems. Rather than displaying participant data directly,
+// facial, pseudo-thermal, and voice data are translated into digital cells
+// with individual appearances and behaviours.
+//
+// As these cells enter a shared computational ecosystem, relationships emerge
+// through similarity, compatibility, proximity, and time. Individual
+// contributions gradually become part of a collective system, making normally
+// invisible processes of data interpretation, connection, and computational
+// mediation perceptible.
+//
+// Individuals become a collective. Data becomes life.
+
+
+// Acknowledgements:
+// Google MediaPipe. Face Detection / Face Landmarker.
+// https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker/web_js
+
+// Acknowledgements:
+// Google MediaPipe. Selfie Segmentation.
+// https://developers.google.com/mediapipe/solutions/vision/selfie_segmentation
+
+// Acknowledgements:
+// OpenCV.js. Image Processing (imgproc module).
+// https://docs.opencv.org/4.x/d5/d10/tutorial_js_root.html
+
+// Acknowledgements:
+// p5.js / p5.sound. p5.FFT — Audio Analysis.
+// https://p5js.org/reference/p5.sound/p5.FFT/
+
+// Acknowledgements:
+// Reynolds, C. W. Boids: Background and Update.
+// Reference for autonomous agents and collective behaviour.
+// https://www.red3d.com/cwr/boids/
+
+// Acknowledgements:
+// The Coding Train. Flocking Simulation.
+// Reference for steering, attraction, cohesion, and collective movement.
+// https://thecodingtrain.com/challenges/124-flocking-simulation/
+
 const MODE = document.body.dataset.mode || 'capture';
 const IS_CAPTURE = MODE === 'capture';
 const IS_PROJECTION = MODE === 'projection';
