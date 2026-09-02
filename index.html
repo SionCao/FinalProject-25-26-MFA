@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Face Cell Capture</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+
+  <style>
+    html, body { margin:0; padding:0; overflow:hidden; background:#eef2ed; font-family: Arial, sans-serif; }
+    video { display:none; }
+    canvas { position:absolute; left:0; top:0; display:block; }
+    #webglCanvas { z-index:1; }
+    #overlayCanvas { z-index:2; pointer-events:none; }
+    #openProjection {
+      position: fixed; right: 22px; top: 18px; z-index: 50;
+      font: 14px Arial; padding: 10px 14px; border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.18); background: rgba(255,255,255,.72);
+      backdrop-filter: blur(10px); cursor: pointer; opacity: .72; transition: opacity .18s ease;
+    }
+    #openProjection:hover { opacity: .95; }
+    .camera-panel {
+      position: fixed; left: 22px; top: 78px; z-index: 10;
+      padding: 10px 12px; border-radius: 16px;
+      border: 1px solid rgba(0,0,0,.16); background: rgba(255,255,255,.72);
+      backdrop-filter: blur(10px); color: rgba(20,25,22,.82);
+      font: 12px Arial; max-width: 360px; opacity: .12; transition: opacity .18s ease;
+    }
+    .camera-panel:hover { opacity: .95; }
+    #handCameraPanel {
+      left: auto; right: 28px; top: 122px;
+      width: min(520px, calc(38vw - 28px));
+      opacity: .94; max-width: 520px;
+    }
+    #handCameraPanel:hover { opacity: .96; }
+    #microphonePanel { top: 466px; }
+    .camera-panel select { max-width: 500px; margin-top: 6px; }
+    .camera-panel .status { margin-top: 6px; opacity: .78; line-height: 1.25; }
+    #handPreviewWrap {
+      margin-top: 8px; width: 100%; max-width: calc(100vw - 68px);
+      border-radius: 12px; overflow: hidden; border: 1px solid rgba(20,25,22,.18);
+      background: rgba(10,14,12,.82);
+    }
+    #handPreviewCanvas {
+      position: static; left: auto; top: auto; display: block;
+      width: 100%; height: auto;
+    }
+    #handMappingHint {
+      margin-top: 6px; font-size: 11px; line-height: 1.25; opacity: .68;
+    }
+    #handMappingControls {
+      margin-top: 8px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+    }
+    #handMappingControls button {
+      font: 11px Arial; padding: 5px 8px; border-radius: 999px;
+      border: 1px solid rgba(20,25,22,.18); background: rgba(255,255,255,.68);
+      color: rgba(20,25,22,.78); cursor: pointer;
+    }
+    #handMappingControls button.active {
+      background: rgba(118,196,154,.72); color: rgba(10,20,14,.92);
+    }
+    #handMappingState { font-size: 11px; opacity: .70; }
+    #nameGate {
+      position: fixed; inset: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 50% 38%, rgba(245,248,241,0.98), rgba(226,232,222,0.96));
+      color: rgba(22,28,25,0.88);
+      transition: opacity .28s ease, visibility .28s ease;
+    }
+    #nameGate.hidden {
+      opacity: 0; visibility: hidden; pointer-events: none;
+    }
+    #nameForm {
+      width: min(680px, calc(100vw - 46px));
+      text-align: center;
+    }
+    #nameForm label {
+      display: block;
+      font-size: clamp(34px, 6vw, 76px);
+      line-height: 1.02;
+      font-weight: 700;
+      letter-spacing: 0;
+      margin-bottom: 28px;
+    }
+    #participantNameInput {
+      width: 100%;
+      box-sizing: border-box;
+      border: 0;
+      border-bottom: 3px solid rgba(22,28,25,0.36);
+      outline: 0;
+      background: transparent;
+      text-align: center;
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 600;
+      color: rgba(22,28,25,0.88);
+      padding: 8px 10px 16px;
+      border-radius: 0;
+    }
+    #participantNameInput::placeholder { color: rgba(22,28,25,0.24); }
+    #nameHint {
+      margin-top: 22px;
+      font-size: clamp(14px, 1.45vw, 20px);
+      color: rgba(22,28,25,0.54);
+    }
+  </style>
+</head>
+<body data-mode="capture">
+  <div id="nameGate">
+    <form id="nameForm" autocomplete="off">
+      <label for="participantNameInput">enter your name</label>
+      <input id="participantNameInput" name="participantName" type="text" maxlength="32" autocomplete="off" spellcheck="false" placeholder="nickname" />
+      <div id="nameHint">press enter to join the digital ecosystem</div>
+    </form>
+  </div>
+  <button id="openProjection">Open projection window</button>
+  <div id="cameraPanel" class="camera-panel">
+    <div>Face Camera</div>
+    <select id="cameraSelect"><option>Looking for built-in face camera...</option></select>
+    <div id="cameraStatus" class="status">Please allow camera permission.</div>
+  </div>
+  <div id="handCameraPanel" class="camera-panel">
+    <div>Hand Camera</div>
+    <select id="handCameraSelect"><option>Looking for top-down camera...</option></select>
+    <select id="handDetectionMode">
+      <option value="mediapipe">MediaPipe Hands / fingertip nodes</option>
+      <option value="motion">Fallback motion / contour</option>
+    </select>
+    <div id="handCameraStatus" class="status">Waiting for hand camera.</div>
+    <div id="handPreviewWrap"><canvas id="handPreviewCanvas" width="520" height="304"></canvas></div>
+    <div id="handMappingControls">
+      <button id="handMirrorX" type="button">Flip X</button>
+      <button id="handMirrorY" type="button">Flip Y</button>
+      <button id="handResetMap" type="button">Reset map</button>
+      <span id="handMappingState">X normal / Y normal</span>
+    </div>
+    <div id="handMappingHint">Green dot = fingertip. Yellow dot = projected target in the petri dish. If it moves opposite your finger, use Flip X/Y.</div>
+  </div>
+  <div id="microphonePanel" class="camera-panel">
+    <div>Microphone</div>
+    <select id="microphoneSelect"><option>Using system microphone...</option></select>
+    <div id="microphoneStatus" class="status">Voice shapes cell movement.</div>
+  </div>
+  <video class="input_video" playsinline muted></video>
+  <canvas id="webglCanvas"></canvas>
+  <canvas id="overlayCanvas"></canvas>
+
+  <script src="imageProcessing.js?v=thermal-preview-20260716-55"></script>
+  <script src="audioProcessing.js?v=thermal-preview-20260716-55"></script>
+  <script src="segmentation.js?v=thermal-preview-20260716-55"></script>
+  <script src="handCamera.js?v=thermal-preview-20260716-55"></script>
+  <script src="faceFusion.js?v=thermal-preview-20260716-55"></script>
+  <script src="cellSystem.js?v=fusion-growth-20260814-2"></script>
+  <script src="sketch.js?v=gesture-audio-20260811-1"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Face Cell Petri Projection</title>
+  <style>
+    html, body { margin:0; padding:0; overflow:hidden; background: black; font-family: Arial, sans-serif; cursor: none; }
+    canvas { position:absolute; left:0; top:0; display:block; }
+    #webglCanvas { z-index:1; background: transparent; }
+    #overlayCanvas { z-index:2; pointer-events:none; background: transparent; }
+    #fullscreenPrompt {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      background: black; color: rgba(235,245,238,.86);
+      font: 700 28px/1.2 Arial, sans-serif;
+      letter-spacing: 0; cursor: pointer; user-select: none;
+      width: 100vw; height: 100vh; border: 0; padding: 0;
+      appearance: none; -webkit-appearance: none;
+    }
+    #fullscreenPrompt.hidden { display: none; }
+  </style>
+</head>
+<body data-mode="projection">
+  <audio id="bgm" src="bgm.mp3" preload="auto" loop></audio>
+  <canvas id="webglCanvas"></canvas>
+  <canvas id="overlayCanvas"></canvas>
+  <button id="fullscreenPrompt" type="button">click for fullscreen projection</button>
+  <script>
+    const fullscreenPrompt = document.getElementById('fullscreenPrompt');
+
+    function updateFullscreenPrompt() {
+      if (!fullscreenPrompt) return;
+      fullscreenPrompt.classList.toggle('hidden', !!document.fullscreenElement);
+    }
+
+    function enterProjectionFullscreen() {
+      const el = document.documentElement;
+      if (!document.fullscreenElement && el.requestFullscreen) {
+        el.requestFullscreen({ navigationUI: 'hide' })
+          .then(updateFullscreenPrompt)
+          .catch(updateFullscreenPrompt);
+      } else {
+        updateFullscreenPrompt();
+      }
+    }
+    function fitProjectionWindowToScreen() {
+      try {
+        window.moveTo(0, 0);
+        window.resizeTo(screen.availWidth, screen.availHeight);
+      } catch (e) {}
+      updateFullscreenPrompt();
+    }
+    document.addEventListener('fullscreenchange', updateFullscreenPrompt);
+    window.addEventListener('load', fitProjectionWindowToScreen);
+    fullscreenPrompt?.addEventListener('click', enterProjectionFullscreen);
+    window.addEventListener('click', enterProjectionFullscreen);
+    window.addEventListener('pointerdown', enterProjectionFullscreen);
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'f' || event.key === 'F' || event.key === 'Enter' || event.key === ' ') {
+        enterProjectionFullscreen();
+      }
+    });
+  </script>
+
+  <script src="faceFusion.js?v=thermal-preview-20260716-55"></script>
+  <script src="cellSystem.js?v=fusion-growth-20260814-2"></script>
+  <script src="sketch.js?v=gesture-audio-20260811-1"></script>
+</body>
+</html>
