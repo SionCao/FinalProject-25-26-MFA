@@ -202,10 +202,6 @@ The project developed through several stages:
 11. Installation and projection tests
 12. Final system integration
 
-Detailed process documentation can be found here:
-
-[Process Documentation](documentation/process.md)
-
 ---
 
 ## Installation
@@ -259,28 +255,7 @@ The initial intention was to project the digital ecosystem onto a transparent sp
 
 This became an important lesson in the development process. While significant time was spent developing the computational system, interaction logic and cell behaviour, comparatively less time was dedicated to physical material testing.
 
-Future projects will therefore integrate material prototyping, projection tests and installation trials much earlier in the technical development process.
-
----
-
-## Process Documentation
-
-The development process is documented through:
-
-- code iterations
-- screenshots
-- visual experiments
-- installation sketches
-- system diagrams
-- failed tests
-- technical decisions
-- Git commit history
-
-See:
-
-- [Process Documentation](documentation/process.md)
-- [Technical Documentation](documentation/technical.md)
-- [Installation Documentation](documentation/installation.md)
+Future projects will therefore integrate material prototyping, projection tests and installation trials much earlier in the technical development process. The project's development history remains available through its Git commit history.
 
 ---
 
