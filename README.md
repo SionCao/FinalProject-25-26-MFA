@@ -176,6 +176,35 @@ The project uses:
 - Web Audio API
 - HTML / CSS
 
+### How to Run
+
+The project must be served through a local web server so that its camera, microphone and shader files can load correctly.
+
+1. Clone or download this repository.
+2. Open Terminal in the project folder.
+3. Start a local server:
+
+   ```bash
+   python3 -m http.server 5501
+   ```
+
+4. Open the capture interface in Google Chrome:
+
+   ```text
+   http://127.0.0.1:5501/index.html
+   ```
+
+5. Allow camera and microphone permissions when prompted.
+6. Use **Open projection window** to launch the shared petri-dish display.
+
+For the exhibition setup on macOS, keep the local server running and execute the included launcher in a second Terminal window:
+
+```bash
+bash launch_exhibition.sh
+```
+
+This opens the capture interface as a fullscreen Chrome app and the petri-dish view in kiosk mode. Google Chrome must be installed in the standard `/Applications` folder.
+
 ### Technical References
 
 - Google MediaPipe — Face Detection / Face Landmarker
